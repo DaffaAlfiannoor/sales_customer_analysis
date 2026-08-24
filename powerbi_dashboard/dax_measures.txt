@@ -1,0 +1,153 @@
+================================================================================
+ DAX MEASURES - Online Retail Power BI Dashboard
+ Copy-paste setiap blok ke: Modeling > New Measure (atau klik kanan tabel _Measures)
+ Format kolom "Measure name =" adalah nama measure, sisanya body rumus.
+================================================================================
+
+
+--------------------------------------------------------------------------------
+ 1. CORE KPIs
+--------------------------------------------------------------------------------
+
+Total Revenue =
+SUM ( FactSales[TotalPrice] )
+    -- Format: Currency ($ English), 0 desimal
+
+Total Orders =
+DISTINCTCOUNT ( FactSales[InvoiceNo] )
+    -- Format: Whole number, ribuan separator
+
+Total Customers =
+DISTINCTCOUNT ( FactSales[CustomerID] )
+    -- Format: Whole number, ribuan separator
+
+Total Items Sold =
+SUM ( FactSales[Quantity] )
+    -- Format: Whole number, ribuan separator
+
+Avg Order Value (AOV) =
+DIVIDE ( [Total Revenue], [Total Orders] )
+    -- Format: Currency, 2 desimal
+
+Avg Items per Order =
+DIVIDE ( [Total Items Sold], [Total Orders] )
+    -- Format: Decimal, 1-2 desimal
+
+Avg Unit Price =
+AVERAGE ( FactSales[UnitPrice] )
+    -- Format: Currency, 2 desimal
+
+Revenue per Customer =
+DIVIDE ( [Total Revenue], [Total Customers] )
+    -- Format: Currency, 0 desimal
+
+
+--------------------------------------------------------------------------------
+ 2. TIME INTELLIGENCE (butuh DimDate di-mark sebagai Date Table)
+--------------------------------------------------------------------------------
+
+Revenue PM =
+CALCULATE ( [Total Revenue], DATEADD ( DimDate[Date], -1, MONTH ) )
+
+Revenue MoM % =
+DIVIDE ( [Total Revenue] - [Revenue PM], [Revenue PM] )
+    -- Format: Percentage, 1 desimal
+
+Orders PM =
+CALCULATE ( [Total Orders], DATEADD ( DimDate[Date], -1, MONTH ) )
+
+Orders MoM % =
+DIVIDE ( [Total Orders] - [Orders PM], [Orders PM] )
+    -- Format: Percentage, 1 desimal
+
+
+--------------------------------------------------------------------------------
+ 3. PRODUCTS
+--------------------------------------------------------------------------------
+
+Active Products =
+DISTINCTCOUNT ( FactSales[StockCode] )
+    -- Format: Whole number
+
+
+--------------------------------------------------------------------------------
+ 4. CUSTOMER & RFM (dari DimCustomer)
+--------------------------------------------------------------------------------
+
+Avg Recency (Days) =
+AVERAGE ( DimCustomer[Recency] )
+    -- Format: Decimal, 1 desimal
+
+Avg Frequency (Orders) =
+AVERAGE ( DimCustomer[Frequency] )
+    -- Format: Decimal, 1 desimal
+
+Avg Monetary ($) =
+AVERAGE ( DimCustomer[Monetary] )
+    -- Format: Currency, 0 desimal
+
+Repeat Rate % =
+VAR CustomerOrders =
+    ADDCOLUMNS (
+        VALUES ( FactSales[CustomerID] ),
+        "@Orders", CALCULATE ( DISTINCTCOUNT ( FactSales[InvoiceNo] ) )
+    )
+VAR RepeatCustomers =
+    COUNTROWS ( FILTER ( CustomerOrders, [@Orders] > 1 ) )
+RETURN
+    DIVIDE ( RepeatCustomers, COUNTROWS ( CustomerOrders ) )
+    -- Format: Percentage, 1 desimal
+
+Champions Revenue % =
+DIVIDE (
+    CALCULATE ( [Total Revenue], DimCustomer[Segment] = "Champions" ),
+    [Total Revenue]
+)
+    -- Format: Percentage, 1 desimal
+
+At Risk Customers =
+CALCULATE ( COUNTROWS ( DimCustomer ), DimCustomer[Segment] = "At Risk" )
+    -- Format: Whole number
+
+Lost Customers Count =
+CALCULATE ( COUNTROWS ( DimCustomer ), DimCustomer[Segment] = "Lost Customers" )
+    -- Format: Whole number
+
+
+--------------------------------------------------------------------------------
+ 5. COHORT & CLV (dari DimCohortCLV & CohortRetention_long)
+--------------------------------------------------------------------------------
+
+New Customers =
+COUNTROWS ( DimCohortCLV )
+    -- Gunakan bersama kolom Cohort untuk chart customer baru per bulan cohort
+
+Total CLV =
+SUM ( DimCohortCLV[CLV] )
+    -- Format: Currency, 0 desimal
+
+Avg CLV =
+AVERAGE ( DimCohortCLV[CLV] )
+    -- Format: Currency, 0 desimal
+
+Avg Lifespan (Months) =
+AVERAGE ( DimCohortCLV[Lifespan] )
+    -- Format: Decimal, 1 desimal
+
+Avg Retention M1 =
+CALCULATE (
+    AVERAGE ( CohortRetention_long[Retention] ),
+    CohortRetention_long[CohortIndex] = 1
+)
+    -- Format: Percentage, 1 desimal. Retention bulan ke-1 rata-rata semua cohort.
+
+
+================================================================================
+ TIPS
+================================================================================
+1. Buat tabel dummy "_Measures" (Home > Enter Data > kosongkan saja > Load),
+   lalu buat semua measure di dalamnya supaya rapi.
+2. Set Display Folder per kategori di properti measure:
+   Core KPIs / Time Intelligence / Products / Customer & RFM / Cohort & CLV.
+3. Sembunyikan kolom kunci asing di FactSales (DateKey, StockCode, dsb.)
+   dari report view agar field list bersih.

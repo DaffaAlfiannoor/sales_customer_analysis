@@ -1,0 +1,47 @@
+{
+  "name": "Retail Analytics",
+  "dataColors": [
+    "#1F6FEB",
+    "#12B886",
+    "#F76707",
+    "#7048E8",
+    "#E64980",
+    "#2F9E44",
+    "#F59F00",
+    "#E03131",
+    "#15AABF",
+    "#5F3DC4"
+  ],
+  "good": "#2F9E44",
+  "neutral": "#F59F00",
+  "bad": "#E03131",
+  "minimum": "#E03131",
+  "center": "#F59F00",
+  "maximum": "#2F9E44",
+  "foreground": "#212529",
+  "background": "#FFFFFF",
+  "backgroundLight": "#F8F9FA",
+  "tableAccent": "#1F6FEB",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14,
+      "color": "#212529"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#495057"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#495057"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Bold",
+      "fontSize": 30,
+      "color": "#1F6FEB"
+    }
+  }
+}
