@@ -35,6 +35,28 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 ```
 
+## Dashboard Interaktif (Streamlit)
+
+Dashboard interaktif tersedia di `app.py` dengan 5 halaman:
+
+| Tab | Isi |
+|---|---|
+| Overview | KPI (revenue, orders, customers, AOV), tren bulanan, top negara |
+| Products | Top 10 produk by unit & revenue, bottom 10 performer |
+| Customers | Top customer, distribusi AOV, repeat purchase rate |
+| Segments (RFM) | Distribusi RFM segment & K-Means cluster, scatter RFM, tabel customer |
+| Retention & CLV | Heatmap cohort retention, kurva retention rata-rata, CLV |
+
+Filter di sidebar: rentang tanggal transaksi dan negara.
+
+```bash
+conda activate py310-ml
+pip install streamlit plotly   # sekali saja
+streamlit run app.py
+```
+
+Dashboard berjalan di `http://localhost:8501`.
+
 ## 2. Load Data
 
 ```python
